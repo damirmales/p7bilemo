@@ -28,12 +28,18 @@ class CustomerProduct
      */
     private $customer;
 
+    /**
+     * CustomerProduct constructor.
+     */
     public function __construct()
     {
         $this->product = new ArrayCollection();
         $this->customer = new ArrayCollection();
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
@@ -47,23 +53,31 @@ class CustomerProduct
         return $this->product;
     }
 
-    public function addProduct(Product $oneToMany): self
+    /**
+     * @param Product $product
+     * @return $this
+     */
+    public function addProduct(Product $product): self
     {
-        if (!$this->product->contains($oneToMany)) {
-            $this->product[] = $oneToMany;
-            $oneToMany->setCustomerProduct($this);
+        if (!$this->product->contains($product)) {
+            $this->product[] = $product;
+            $product->setCustomerProduct($this);
         }
 
         return $this;
     }
 
-    public function removeProduct(Product $oneToMany): self
+    /**
+     * @param Product $product
+     * @return $this
+     */
+    public function removeProduct(Product $product): self
     {
-        if ($this->product->contains($oneToMany)) {
-            $this->product->removeElement($oneToMany);
+        if ($this->product->contains($product)) {
+            $this->product->removeElement($product);
             // set the owning side to null (unless already changed)
-            if ($oneToMany->getCustomerProduct() === $this) {
-                $oneToMany->setCustomerProduct(null);
+            if ($product->getCustomerProduct() === $this) {
+                $product->setCustomerProduct(null);
             }
         }
 
@@ -78,6 +92,10 @@ class CustomerProduct
         return $this->customer;
     }
 
+    /**
+     * @param Customer $customer
+     * @return $this
+     */
     public function addCustomer(Customer $customer): self
     {
         if (!$this->customer->contains($customer)) {
@@ -88,6 +106,10 @@ class CustomerProduct
         return $this;
     }
 
+    /**
+     * @param Customer $customer
+     * @return $this
+     */
     public function removeCustomer(Customer $customer): self
     {
         if ($this->customer->contains($customer)) {

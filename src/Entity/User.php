@@ -44,11 +44,6 @@ class User
     private $status;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $token;
-
-    /**
      * @ORM\Column(type="string", length=255)
      */
     private $password;
@@ -58,21 +53,34 @@ class User
      */
     private $customers;
 
+    /**
+     * User constructor.
+     */
     public function __construct()
     {
         $this->customers = new ArrayCollection();
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return string|null
+     */
     public function getFirstName(): ?string
     {
         return $this->firstName;
     }
 
+    /**
+     * @param string $firstName
+     * @return $this
+     */
     public function setFirstName(string $firstName): self
     {
         $this->firstName = $firstName;
@@ -80,11 +88,18 @@ class User
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getLastName(): ?string
     {
         return $this->lastName;
     }
 
+    /**
+     * @param string $lastName
+     * @return $this
+     */
     public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
@@ -92,11 +107,18 @@ class User
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
+    /**
+     * @param string $email
+     * @return $this
+     */
     public function setEmail(string $email): self
     {
         $this->email = $email;
@@ -104,11 +126,18 @@ class User
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getCustomer(): ?string
     {
         return $this->customer;
     }
 
+    /**
+     * @param string $customer
+     * @return $this
+     */
     public function setCustomer(string $customer): self
     {
         $this->customer = $customer;
@@ -116,11 +145,18 @@ class User
         return $this;
     }
 
+    /**
+     * @return bool|null
+     */
     public function getStatus(): ?bool
     {
         return $this->status;
     }
 
+    /**
+     * @param bool $status
+     * @return $this
+     */
     public function setStatus(bool $status): self
     {
         $this->status = $status;
@@ -128,23 +164,19 @@ class User
         return $this;
     }
 
-    public function getToken(): ?string
-    {
-        return $this->token;
-    }
 
-    public function setToken(?string $token): self
-    {
-        $this->token = $token;
-
-        return $this;
-    }
-
+    /**
+     * @return string|null
+     */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
+    /**
+     * @param string $password
+     * @return $this
+     */
     public function setPassword(string $password): self
     {
         $this->password = $password;
@@ -160,6 +192,10 @@ class User
         return $this->customers;
     }
 
+    /**
+     * @param Customer $customer
+     * @return $this
+     */
     public function addCustomer(Customer $customer): self
     {
         if (!$this->customers->contains($customer)) {
@@ -170,6 +206,10 @@ class User
         return $this;
     }
 
+    /**
+     * @param Customer $customer
+     * @return $this
+     */
     public function removeCustomer(Customer $customer): self
     {
         if ($this->customers->contains($customer)) {
