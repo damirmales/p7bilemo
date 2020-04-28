@@ -2,8 +2,7 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -46,7 +45,7 @@ class Customer
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\CustomerProduct", inversedBy="customer")
+     * @ORM\ManyToOne(targetEntity="App\Entity\CustomerProduct", inversedBy="customer", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $customerProduct;
