@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -44,7 +43,7 @@ class Product
     private $updatedAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\CustomerProduct", inversedBy="product")
+     * @ORM\ManyToOne(targetEntity="App\Entity\CustomerProduct", inversedBy="product", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $customerProduct;

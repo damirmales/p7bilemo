@@ -2,8 +2,7 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -23,10 +22,6 @@ class Customer
      */
     private $name;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $username;
 
     /**
      * @ORM\Column(type="boolean")
@@ -46,7 +41,7 @@ class Customer
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\CustomerProduct", inversedBy="customer")
+     * @ORM\ManyToOne(targetEntity="App\Entity\CustomerProduct", inversedBy="customer", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $customerProduct;
@@ -79,24 +74,6 @@ class Customer
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getUsername(): ?string
-    {
-        return $this->username;
-    }
-
-    /**
-     * @param string $username
-     * @return $this
-     */
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
-    }
 
     /**
      * @return bool|null
