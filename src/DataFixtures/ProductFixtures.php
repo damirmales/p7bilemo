@@ -25,7 +25,7 @@ class ProductFixtures extends Fixture
             $customerProd = new CustomerProduct();
             $customerProd->addProduct($product);
 
-            $product->setName('phone_'.$i)
+            $product->setName('phone_' . $i)
                 ->setPrice(mt_rand(100, 300))
                 ->setCreatedAt(new \DateTime());
 

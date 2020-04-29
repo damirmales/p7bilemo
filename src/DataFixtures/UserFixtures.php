@@ -6,12 +6,15 @@ use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
+
 /**
  * Class UserFixtures
  * @package App\DataFixtures
  */
 class UserFixtures extends Fixture
 {
+    public $userid = [];
+
     /**
      * @param ObjectManager $manager
      */
@@ -19,16 +22,18 @@ class UserFixtures extends Fixture
     {
         for ($i = 0; $i < 5; $i++) {
             $user = new User();
-            $user->setFirstName('phone_' . $i)
-                ->setLastName('custiomer' . $i)
-                ->setEmail('phone_' . $i)
+            $this->userid[$i] = $user;
+            $user->setFirstName('bill_' . $i)
+                ->setLastName('hobbes_' . $i)
+                ->setEmail('email_' . $i . '@gemel.com')
                 ->setCustomer('custom' . $i)
                 ->setStatus(1)
                 ->setPassword('toto');
-
+            $this->setReference('userid'.$i, $this->userid[$i]);
             $manager->persist($user);
         }
         $manager->flush();
+
     }
 
 }

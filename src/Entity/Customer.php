@@ -22,10 +22,6 @@ class Customer
      */
     private $name;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $username;
 
     /**
      * @ORM\Column(type="boolean")
@@ -78,24 +74,6 @@ class Customer
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getUsername(): ?string
-    {
-        return $this->username;
-    }
-
-    /**
-     * @param string $username
-     * @return $this
-     */
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
-    }
 
     /**
      * @return bool|null

@@ -20,20 +20,14 @@ class CustomerFixtures extends Fixture implements DependentFixtureInterface
      */
     public function load(ObjectManager $manager)
     {
-        $userId = [];
-        $users = $manager->getRepository(User::class)->findAll();
-        foreach ($users as $user) {
-            array_push($userId, $user);
-        }
 
         for ($i = 0; $i < 5; $i++) {
             $customer = new Customer();
             $customerProd = new CustomerProduct();
             $customerProd->addCustomer($customer);
-
+            $userid = $this->getReference('userid'.$i);
             $customer->setName('customer' . $i)
-                ->setUser($userId[array_rand($userId)])
-                ->setUsername('custom' . $i)
+                ->setUser($userid)
                 ->setStatus(1)
                 ->setPassword('toto');
 
