@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Product;
 use App\Repository\ProductRepository;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\View;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -11,37 +14,25 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProductController extends AbstractController
 {
     /**
-     * @Route("/products", name="list_products")
+     * @Get("/products", name="list_products")
+     * @View
      * @param ProductRepository $productRepository
-     * @param SerializerInterface $serialize
-     * @return JsonResponse
+     * @return Product[]
      */
-    public function products(ProductRepository $productRepository, SerializerInterface $serialize )
+    public function products(ProductRepository $productRepository)
     {
-        // collect all product data
-        $products = $productRepository->findAll();
-
-        //serialize collected data
-        $productSerialized = $serialize->serialize($products, "json");
-
-        return new JsonResponse($productSerialized, 200, [], true);
+        $allProduct = $productRepository->findAll();
+        return $allProduct;
     }
 
     /**
-     * @Route("/products/{id}", name="one_product")
-     * @param $id
-     * @param ProductRepository $productRepository
-     * @param SerializerInterface $serialize
-     * @return JsonResponse
+     * @Get("/products/{id}", name="one_product")
+     * @View
+     * @param Product $product
+     * @return Product
      */
-    public function getOneProduct($id, ProductRepository $productRepository, SerializerInterface $serialize )
+    public function getOneProduct(Product $product)
     {
-        // collect a specific product
-        $product = $productRepository->findOneById($id);
-
-        //serialize collected data
-        $productSerialized = $serialize->serialize($product, "json");
-
-        return new JsonResponse($productSerialized, 200, [], true);
+        return $product;
     }
 }
