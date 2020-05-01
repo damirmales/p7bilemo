@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -35,17 +37,27 @@ class Customer
     private $password;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="customers")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="customer")
+     *
      */
-    private $user;
+    private $users;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\CustomerProduct", inversedBy="customer", cascade={"persist"})
+     * @ORM\ManyToMany(targetEntity="App\Entity\Product", inversedBy="customers", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
-    private $customerProduct;
+    private $products;
 
+
+
+    /**
+     * Customer constructor.
+     */
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
+        $this->products = new ArrayCollection();
+    }
 
     /**
      * @return int|null
@@ -114,42 +126,59 @@ class Customer
     }
 
     /**
-     * @return User|null
+     * @return Collection
      */
-    public function getUser(): ?User
+    public function getUsers(): Collection
     {
-        return $this->user;
+        return $this->users;
     }
 
     /**
-     * @param User|null $User
+     * @param Collection
      * @return $this
      */
-    public function setUser(?User $User): self
+    public function setUsers(Collection $users): self
     {
-        $this->user = $User;
-
-        return $this;
-    }
-
-    /**
-     * @return CustomerProduct|null
-     */
-    public function getCustomerProduct(): ?CustomerProduct
-    {
-        return $this->customerProduct;
-    }
-
-    /**
-     * @param CustomerProduct|null $customerProduct
-     * @return $this
-     */
-    public function setCustomerProduct(?CustomerProduct $customerProduct): self
-    {
-        $this->customerProduct = $customerProduct;
+        $this->users = $users;
 
         return $this;
     }
 
 
+    /**
+     * @return Collection|Product[]
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    /**
+     * @param Product $products
+     * @return $this
+     */
+    public function setProducts(Product $products): self
+    {
+        $this->products = $products;
+
+        return $this;
+    }
+
+    public function addProducts(Product $products): self
+    {
+        if (!$this->products->contains($products)) {
+            $this->products[] = $products;
+        }
+
+        return $this;
+    }
+
+    public function removeProducts(Product $products): self
+    {
+        if ($this->products->contains($products)) {
+            $this->products->removeElement($products);
+        }
+
+        return $this;
+    }
 }

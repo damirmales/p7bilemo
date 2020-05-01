@@ -2,7 +2,9 @@
 fos_rest:
      body_converter:
           enabled: true
-#    param_fetcher_listener:  true
+          validate: true
+          validation_errors_argument: validationErrors
+     param_fetcher_listener:  force
      allowed_methods_listener:  true
 #    routing_loader: true
      view:
@@ -11,8 +13,10 @@ fos_rest:
      serializer:
           serialize_null: true
 
-#    exception:
-#        codes:
+     exception:
+         enabled: true
+         codes:
+             'Symfony\Component\Routing\Exception\ResourceNotFoundException': 404
 #            App\Exception\MyException: 403
 #        messages:
 #            App\Exception\MyException: Forbidden area.

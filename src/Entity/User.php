@@ -34,7 +34,8 @@ class User
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="App\Entity\Customer", inversedBy="users")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $customer;
 
@@ -48,18 +49,8 @@ class User
      */
     private $password;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Customer", mappedBy="user")
-     */
-    private $customers;
 
-    /**
-     * User constructor.
-     */
-    public function __construct()
-    {
-        $this->customers = new ArrayCollection();
-    }
+
 
     /**
      * @return int|null
@@ -126,24 +117,6 @@ class User
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getCustomer(): ?string
-    {
-        return $this->customer;
-    }
-
-    /**
-     * @param string $customer
-     * @return $this
-     */
-    public function setCustomer(string $customer): self
-    {
-        $this->customer = $customer;
-
-        return $this;
-    }
 
     /**
      * @return bool|null
@@ -185,11 +158,22 @@ class User
     }
 
     /**
-     * @return Collection|Customer[]
+     * @return Customer
      */
-    public function getCustomers(): Collection
+    public function getCustomer(): Customer
     {
-        return $this->customers;
+        return $this->customer;
+    }
+
+    /**
+     * @param mixed $customer
+     * @return User
+     */
+    public function setCustomer($customer): User
+    {
+        $this->customer = $customer;
+
+        return $this;
     }
 
     /**
@@ -222,4 +206,5 @@ class User
 
         return $this;
     }
+
 }

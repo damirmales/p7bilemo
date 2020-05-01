@@ -22,8 +22,8 @@ class ProductFixtures extends Fixture
         for ($i = 0; $i < 10; $i++) {
             $product = new Product();
 
-            $customerProd = new CustomerProduct();
-            $customerProd->addProduct($product);
+            $customer = new Customer();
+            $customer->addProduct($product);
 
             $product->setName('phone_' . $i)
                 ->setPrice(mt_rand(100, 300))
