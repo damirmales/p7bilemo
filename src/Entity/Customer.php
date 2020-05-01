@@ -144,9 +144,34 @@ class Customer
         return $this;
     }
 
+    /**
+     * @param User $user
+     * @return $this
+     */
+    public function addUsers(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+        }
+
+        return $this;
+    }
 
     /**
-     * @return Collection|Product[]
+     * @param User $user
+     * @return $this
+     */
+    public function removeUsers(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
      */
     public function getProducts(): Collection
     {

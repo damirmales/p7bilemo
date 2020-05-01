@@ -184,7 +184,7 @@ class User
     {
         if (!$this->customer->contains($customer)) {
             $this->customer[] = $customer;
-            $customer->setUsers($this);
+            $customer->addUsers($this);
         }
 
         return $this;
