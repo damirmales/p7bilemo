@@ -182,9 +182,9 @@ class User
      */
     public function addCustomer(Customer $customer): self
     {
-        if (!$this->customers->contains($customer)) {
-            $this->customers[] = $customer;
-            $customer->setUser($this);
+        if (!$this->customer->contains($customer)) {
+            $this->customer[] = $customer;
+            $customer->setUsers($this);
         }
 
         return $this;
@@ -196,11 +196,11 @@ class User
      */
     public function removeCustomer(Customer $customer): self
     {
-        if ($this->customers->contains($customer)) {
-            $this->customers->removeElement($customer);
+        if ($this->customer->contains($customer)) {
+            $this->customer->removeElement($customer);
             // set the owning side to null (unless already changed)
-            if ($customer->getUser() === $this) {
-                $customer->setUser(null);
+            if ($customer->getUsers() === $this) {
+                $customer->setUsers(null);
             }
         }
 

@@ -154,29 +154,29 @@ class Customer
     }
 
     /**
-     * @param Product $products
+     * @param Product $product
      * @return $this
      */
-    public function setProducts(Product $products): self
+    public function setProducts(Product $product): self
     {
-        $this->products = $products;
+        $this->products = $product;
 
         return $this;
     }
 
-    public function addProducts(Product $products): self
+    public function addProducts(Product $product): self
     {
-        if (!$this->products->contains($products)) {
-            $this->products[] = $products;
+        if (!$this->products->contains($product)) {
+            $this->products[] = $product;
         }
 
         return $this;
     }
 
-    public function removeProducts(Product $products): self
+    public function removeProducts(Product $product): self
     {
-        if ($this->products->contains($products)) {
-            $this->products->removeElement($products);
+        if ($this->products->contains($product)) {
+            $this->products->removeElement($product);
         }
 
         return $this;

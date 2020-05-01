@@ -180,7 +180,7 @@ class Product
         return $this;
     }
 
-    public function addCustomer(Customer $customer): self
+    public function addCustomers(Customer $customer): self
     {
         if (!$this->customers->contains($customer)) {
             $this->customers[] = $customer;
@@ -190,7 +190,7 @@ class Product
         return $this;
     }
 
-    public function removeCustomer(Customer $customer): self
+    public function removeCustomers(Customer $customer): self
     {
         if ($this->customers->contains($customer)) {
             $this->customers->removeElement($customer);
