@@ -34,7 +34,7 @@ class User
     private $email;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Customer", inversedBy="users")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Customer", inversedBy="users",  cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $customer;
@@ -166,45 +166,16 @@ class User
     }
 
     /**
-     * @param mixed $customer
-     * @return User
+     * @param Customer $customer
+     * @return $this|Customer
      */
-    public function setCustomer($customer): User
+    public function setCustomer(Customer $customer)
     {
         $this->customer = $customer;
 
         return $this;
     }
 
-    /**
-     * @param Customer $customer
-     * @return $this
-     */
-    public function addCustomer(Customer $customer): self
-    {
-        if (!$this->customer->contains($customer)) {
-            $this->customer[] = $customer;
-            $customer->addUsers($this);
-        }
 
-        return $this;
-    }
-
-    /**
-     * @param Customer $customer
-     * @return $this
-     */
-    public function removeCustomer(Customer $customer): self
-    {
-        if ($this->customer->contains($customer)) {
-            $this->customer->removeElement($customer);
-            // set the owning side to null (unless already changed)
-            if ($customer->getUsers() === $this) {
-                $customer->setUsers(null);
-            }
-        }
-
-        return $this;
-    }
 
 }

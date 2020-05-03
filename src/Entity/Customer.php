@@ -37,14 +37,14 @@ class Customer
     private $password;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="customer")
+     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="customer",  cascade={"persist"})
      *
      */
     private $users;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Product", inversedBy="customers", cascade={"persist"})
-     * @ORM\JoinColumn(nullable=false)
+     *
      */
     private $products;
 
@@ -179,12 +179,12 @@ class Customer
     }
 
     /**
-     * @param Product $product
+     * @param Collection $products
      * @return $this
      */
-    public function setProducts(Product $product): self
+    public function setProducts(Collection $products): self
     {
-        $this->products = $product;
+        $this->products = $products;
 
         return $this;
     }

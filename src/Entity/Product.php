@@ -44,8 +44,8 @@ class Product
     private $updatedAt;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Customer", inversedBy="products", cascade={"persist"})
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToMany(targetEntity="App\Entity\Customer", mappedBy="products", cascade={"persist"})
+     *
      */
     private $customers;
 
@@ -170,10 +170,10 @@ class Product
     }
 
     /**
-     * @param Customer|null $customers
+     * @param Collection $customers
      * @return $this
      */
-    public function setCustomers(Customer $customers): self
+    public function setCustomers(Collection $customers): self
     {
         $this->customers = $customers;
 
