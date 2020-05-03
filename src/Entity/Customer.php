@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -35,17 +37,27 @@ class Customer
     private $password;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="customers")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="customer",  cascade={"persist"})
+     *
      */
-    private $user;
+    private $users;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\CustomerProduct", inversedBy="customer", cascade={"persist"})
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToMany(targetEntity="App\Entity\Product", inversedBy="customers", cascade={"persist"})
+     *
      */
-    private $customerProduct;
+    private $products;
 
+
+
+    /**
+     * Customer constructor.
+     */
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
+        $this->products = new ArrayCollection();
+    }
 
     /**
      * @return int|null
@@ -114,42 +126,84 @@ class Customer
     }
 
     /**
-     * @return User|null
+     * @return Collection
      */
-    public function getUser(): ?User
+    public function getUsers(): Collection
     {
-        return $this->user;
+        return $this->users;
     }
 
     /**
-     * @param User|null $User
+     * @param Collection
      * @return $this
      */
-    public function setUser(?User $User): self
+    public function setUsers(Collection $users): self
     {
-        $this->user = $User;
+        $this->users = $users;
 
         return $this;
     }
 
     /**
-     * @return CustomerProduct|null
-     */
-    public function getCustomerProduct(): ?CustomerProduct
-    {
-        return $this->customerProduct;
-    }
-
-    /**
-     * @param CustomerProduct|null $customerProduct
+     * @param User $user
      * @return $this
      */
-    public function setCustomerProduct(?CustomerProduct $customerProduct): self
+    public function addUsers(User $user): self
     {
-        $this->customerProduct = $customerProduct;
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+        }
 
         return $this;
     }
 
+    /**
+     * @param User $user
+     * @return $this
+     */
+    public function removeUsers(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+        }
 
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    /**
+     * @param Collection $products
+     * @return $this
+     */
+    public function setProducts(Collection $products): self
+    {
+        $this->products = $products;
+
+        return $this;
+    }
+
+    public function addProducts(Product $product): self
+    {
+        if (!$this->products->contains($product)) {
+            $this->products[] = $product;
+        }
+
+        return $this;
+    }
+
+    public function removeProducts(Product $product): self
+    {
+        if ($this->products->contains($product)) {
+            $this->products->removeElement($product);
+        }
+
+        return $this;
+    }
 }

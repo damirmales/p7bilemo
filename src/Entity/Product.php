@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -43,10 +44,10 @@ class Product
     private $updatedAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\CustomerProduct", inversedBy="product", cascade={"persist"})
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToMany(targetEntity="App\Entity\Customer", mappedBy="products", cascade={"persist"})
+     *
      */
-    private $customerProduct;
+    private $customers;
 
     /**
      * Product constructor.
@@ -161,20 +162,40 @@ class Product
 
 
     /**
-     * @return CustomerProduct|null
+     * @return Collection
      */
-    public function getCustomerProduct(): ?CustomerProduct
+    public function getCustomers(): Collection
     {
-        return $this->customerProduct;
+        return $this->customers;
     }
 
     /**
-     * @param CustomerProduct|null $customerProduct
+     * @param Collection $customers
      * @return $this
      */
-    public function setCustomerProduct(?CustomerProduct $customerProduct): self
+    public function setCustomers(Collection $customers): self
     {
-        $this->customerProduct = $customerProduct;
+        $this->customers = $customers;
+
+        return $this;
+    }
+
+    public function addCustomers(Customer $customer): self
+    {
+        if (!$this->customers->contains($customer)) {
+            $this->customers[] = $customer;
+            $customer->addProducts($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCustomers(Customer $customer): self
+    {
+        if ($this->customers->contains($customer)) {
+            $this->customers->removeElement($customer);
+            $customer->removeProducts($this);
+        }
 
         return $this;
     }
