@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProductController extends AbstractController
 {
     /**
-     * @Post("/products", name="list_products")
+     * @Get("/products", name="list_products")
      * @View
      * @param ProductRepository $productRepository
      * @return Product[]
