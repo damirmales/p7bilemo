@@ -44,13 +44,10 @@ class ApiFixtures extends Fixture
                 ->setCustomer($customer)
                 ->setStatus(1)
                 ->setPassword('pswd');
-
         }
 
         $manager->persist($customer);
         $manager->persist($user);
         $manager->flush();
-
     }
-
 }
