@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -44,11 +45,16 @@ class UserController extends AbstractController
      * @Rest\Post("/users", name="create_user")
      * @View
      * @ParamConverter("user", converter="fos_rest.request_body")
-     * @param UserRepository $userRepository
+     * @param User $user
+     * @param EntityManagerInterface $entityManager
+     * @param CustomerRepository $customerRepository
      * @return User
      */
-    public function postUser(User $user, EntityManagerInterface $entityManager)
+    public function createUser(User $user, EntityManagerInterface $entityManager, CustomerRepository $customerRepository)
     {
+        $customer = $customerRepository->find(75);
+        $user->setCustomer($customer);
+
         $entityManager->persist($user);
         $entityManager->flush();
 
