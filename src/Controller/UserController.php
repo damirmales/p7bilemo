@@ -9,11 +9,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\View;
-use JMS\Serializer\SerializerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+
 
 class UserController extends AbstractController
 {
@@ -43,7 +41,7 @@ class UserController extends AbstractController
 
     /**
      * @Rest\Post("/users", name="create_user")
-     * @View
+     * @Rest\View(StatusCode = 201)
      * @ParamConverter("user", converter="fos_rest.request_body")
      * @param User $user
      * @param EntityManagerInterface $entityManager
@@ -52,8 +50,7 @@ class UserController extends AbstractController
      */
     public function createUser(User $user, EntityManagerInterface $entityManager, CustomerRepository $customerRepository)
     {
-        $customer = $customerRepository->find(75);
-        $user->setCustomer($customer);
+        $user->setCustomer($this->getUser());
 
         $entityManager->persist($user);
         $entityManager->flush();
