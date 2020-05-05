@@ -6,11 +6,12 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CustomerRepository")
  */
-class Customer
+class Customer implements UserInterface
 {
     /**
      * @ORM\Id()
@@ -23,6 +24,11 @@ class Customer
      * @ORM\Column(type="string", length=255)
      */
     private $name;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $email;
 
 
     /**
@@ -86,6 +92,24 @@ class Customer
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param mixed $email
+     */
+    public function setEmail($email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
 
     /**
      * @return bool|null
@@ -105,6 +129,7 @@ class Customer
 
         return $this;
     }
+
 
     /**
      * @return string|null
@@ -205,5 +230,25 @@ class Customer
         }
 
         return $this;
+    }
+
+    public function getRoles()
+    {
+         return ['ROLE_USER'];
+    }
+
+    public function getSalt()
+    {
+
+    }
+
+    public function getUsername()
+    {
+        return $this->email;
+    }
+
+    public function eraseCredentials()
+    {
+
     }
 }

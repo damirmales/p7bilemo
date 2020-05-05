@@ -34,6 +34,7 @@ class ApiFixtures extends Fixture
             //add product to Customer
             $customer->addProducts($product)
                 ->setName('customer'.$i)
+                ->setEmail('email_' . $i . '@customer.fr')
                 ->setStatus(1)
                 ->setPassword('motdepasse');
 
