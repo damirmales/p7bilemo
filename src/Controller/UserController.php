@@ -11,20 +11,50 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 
 class UserController extends AbstractController
 {
+    private $userRepo;
+
+    /**
+     * @return mixed
+     */
+    public function getUserRepo()
+    {
+        return $this->userRepo;
+    }
+
+    /**
+     * @param $userRepo
+     */
+    public function setUserRepo($userRepo): self
+    {
+        $this->userRepo = $userRepo;
+        return $this;
+    }
+
+
     /**
      * @Get("/users", name="list_users")
-     * @View
+     * @View(StatusCode = 200)
      * @param UserRepository $userRepository
-     * @return User[]
+     * @param TagAwareCacheInterface $cache
+     * @return mixed
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function users(UserRepository $userRepository)
+    public function users(UserRepository $userRepository, TagAwareCacheInterface  $cache)
     {
-        $allUsers = $userRepository->findAll();
-        return $allUsers;
+        $this->setUserRepo($userRepository);
+
+        return $cache->get('users', function (ItemInterface $item) {
+            $item->expiresAfter(3600);
+            $item->tag(['users']);
+            return $this->getUserRepo()->findAll();
+        });
+
     }
 
 
@@ -48,7 +78,7 @@ class UserController extends AbstractController
      * @param CustomerRepository $customerRepository
      * @return User
      */
-    public function createUser(User $user, EntityManagerInterface $entityManager, CustomerRepository $customerRepository)
+    public function createUser(User $user, EntityManagerInterface $entityManager)
     {
         $user->setCustomer($this->getUser());
 
