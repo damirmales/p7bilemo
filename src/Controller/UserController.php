@@ -10,6 +10,7 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -18,6 +19,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 class UserController extends AbstractController
 {
     private $userRepo;
+    private $requestedUser;
 
     public function __construct(UserRepository $repository)
     {
@@ -35,7 +37,7 @@ class UserController extends AbstractController
     public function users(TagAwareCacheInterface $cache)
     {
         return $cache->get('users', function (ItemInterface $item) {
-            $item->expiresAfter(3600);
+            $item->expiresAfter(1800);
             $item->tag(['users']);
             $customer = $this->getUser();
             $usersOfCustomer = $this->userRepo->findBy(['customer' => $customer]);
@@ -51,14 +53,21 @@ class UserController extends AbstractController
      * @param User $user
      * @return User
      */
-    public function getOneUser(User $user)
+    public function getOneUser(User $user, TagAwareCacheInterface $cache)
     {
-        $requestedUser = $user;
-        if ($this->getUser()->getId() == $requestedUser->getCustomer()->getId()) {
-            return $user;
-        } else {
-            return new Response('Cet utilisateur ne vous appartient pas');
-        }
+        $this->setRequestedUser($user);
+
+        return $cache->get('users', function (ItemInterface $item) {
+            $item->expiresAfter(1800);
+            $item->tag(['users']);
+
+            if ($this->getUser()->getId() == $this->getRequestedUser()->getCustomer()->getId()) {
+                return $this->getRequestedUser();
+            } else {
+                return new Response('Cet utilisateur ne vous appartient pas');
+            }
+
+        });
 
     }
 
@@ -77,7 +86,7 @@ class UserController extends AbstractController
 
         $entityManager->persist($user);
         $entityManager->flush();
-        $cache->delete('user');
+        $cache->delete('users');
         return $user;
     }
 
@@ -92,10 +101,10 @@ class UserController extends AbstractController
      * @param TagAwareCacheInterface $cache
      * @return User|Response
      */
-    public function updateUser(User $user, User $updatedUser,EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
+    public function updateUser(User $user, User $updatedUser, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
         $requestedUser = $user;
-
+        $cache->delete('users');
         if ($this->getUser()->getId() == $requestedUser->getCustomer()->getId()) {
 
             $user->setCustomer($this->getUser());
@@ -107,6 +116,7 @@ class UserController extends AbstractController
 
             $entityManager->flush();
             return $user;
+
         } else {
             return new Response('Cet utilisateur ne vous appartient pas');
         }
@@ -120,10 +130,35 @@ class UserController extends AbstractController
      */
     public function deleteUser(User $user, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
-        $entityManager->remove($user);
-        $entityManager->flush();
-        $cache->delete('user');
+        $cache->delete('users');
+        $requestedUser = $user;
+        if ($this->getUser()->getId() == $requestedUser->getCustomer()->getId()) {
+            $entityManager->remove($user);
+            $entityManager->flush();
+
+        } else {
+            return new Response('Cet utilisateur ne vous appartient pas');
+
+        }
+        return new JsonResponse(['message' => 'Utilisateur supprimé']);
+}
+
+    /**
+     * @return mixed
+     */
+    public function getRequestedUser()
+    {
+        return $this->requestedUser;
     }
 
+    /**
+     * @param mixed $requestedUser
+     */
+    public function setRequestedUser($requestedUser)
+    {
+        $this->requestedUser = $requestedUser;
+
+        return $this;
+    }
 
 }
