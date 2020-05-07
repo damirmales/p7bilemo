@@ -11,6 +11,8 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -19,40 +21,27 @@ class UserController extends AbstractController
 {
     private $userRepo;
 
-    /**
-     * @return mixed
-     */
-    public function getUserRepo()
+    public function __construct(UserRepository $repository)
     {
-        return $this->userRepo;
-    }
+        $this->userRepo = $repository;
 
-    /**
-     * @param $userRepo
-     */
-    public function setUserRepo($userRepo): self
-    {
-        $this->userRepo = $userRepo;
-        return $this;
     }
-
 
     /**
      * @Get("/users", name="list_users")
      * @View(StatusCode = 200)
-     * @param UserRepository $userRepository
      * @param TagAwareCacheInterface $cache
      * @return mixed
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function users(UserRepository $userRepository, TagAwareCacheInterface  $cache)
+    public function users(TagAwareCacheInterface $cache)
     {
-        $this->setUserRepo($userRepository);
-
         return $cache->get('users', function (ItemInterface $item) {
             $item->expiresAfter(3600);
             $item->tag(['users']);
-            return $this->getUserRepo()->findAll();
+            $customer = $this->getUser();
+            $usersOfCustomer = $this->userRepo->findBy(['customer' => $customer]);
+            return $usersOfCustomer;
         });
 
     }
@@ -60,13 +49,19 @@ class UserController extends AbstractController
 
     /**
      * @Get("/users/{id}", name="one_user")
-     * @View
+     * @View(StatusCode = 200)
      * @param User $user
      * @return User
      */
     public function getOneUser(User $user)
     {
-        return $user;
+        $requestedUser = $user;
+        if ($this->getUser()->getId() == $requestedUser->getCustomer()->getId()) {
+            return $user;
+        } else {
+            return new Response('Cet utilisateur ne vous appartient pas');
+        }
+
     }
 
     /**
@@ -75,7 +70,7 @@ class UserController extends AbstractController
      * @ParamConverter("user", converter="fos_rest.request_body")
      * @param User $user
      * @param EntityManagerInterface $entityManager
-     * @param CustomerRepository $customerRepository
+     *
      * @return User
      */
     public function createUser(User $user, EntityManagerInterface $entityManager)
@@ -91,6 +86,7 @@ class UserController extends AbstractController
 
     /**
      * @Rest\Put("/users/{id}", name="update_user")
+     * @View(StatusCode = 200)
      * @param User $user
      * @param EntityManagerInterface $entityManager
      * @return User
@@ -105,6 +101,7 @@ class UserController extends AbstractController
 
     /**
      * @Rest\Delete("/users/{id}", name="delete_user")
+     * @View(StatusCode = 200)
      * @param User $user
      * @param EntityManagerInterface $entityManager
      */
@@ -112,5 +109,6 @@ class UserController extends AbstractController
     {
         $entityManager->remove($user);
     }
+
 
 }
