@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -11,7 +10,6 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -73,13 +71,13 @@ class UserController extends AbstractController
      *
      * @return User
      */
-    public function createUser(User $user, EntityManagerInterface $entityManager)
+    public function createUser(User $user, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
         $user->setCustomer($this->getUser());
 
         $entityManager->persist($user);
         $entityManager->flush();
-
+        $cache->delete('user');
         return $user;
     }
 
@@ -87,16 +85,31 @@ class UserController extends AbstractController
     /**
      * @Rest\Put("/users/{id}", name="update_user")
      * @View(StatusCode = 200)
+     * @ParamConverter("updatedUser", converter="fos_rest.request_body")
      * @param User $user
+     * @param User $updatedUser
      * @param EntityManagerInterface $entityManager
-     * @return User
+     * @param TagAwareCacheInterface $cache
+     * @return User|Response
      */
-    public function updateUser(User $user, EntityManagerInterface $entityManager)
+    public function updateUser(User $user, User $updatedUser,EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
+        $requestedUser = $user;
 
-        $entityManager->flush();
+        if ($this->getUser()->getId() == $requestedUser->getCustomer()->getId()) {
 
-        return $user;
+            $user->setCustomer($this->getUser());
+            $user->setFirstname($updatedUser->getFirstname());
+            $user->setLastname($updatedUser->getLastname());
+            $user->setEmail($updatedUser->getEmail());
+            $user->setStatus($updatedUser->getStatus());
+            $user->setPassword($updatedUser->getPassword());
+
+            $entityManager->flush();
+            return $user;
+        } else {
+            return new Response('Cet utilisateur ne vous appartient pas');
+        }
     }
 
     /**
@@ -105,9 +118,11 @@ class UserController extends AbstractController
      * @param User $user
      * @param EntityManagerInterface $entityManager
      */
-    public function deleteUser(User $user, EntityManagerInterface $entityManager)
+    public function deleteUser(User $user, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
         $entityManager->remove($user);
+        $entityManager->flush();
+        $cache->delete('user');
     }
 
 
