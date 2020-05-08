@@ -14,6 +14,7 @@ class AuthController extends AbstractController
 {
     /**
      * @Rest\Post("/login", name="auth")
+     * @Rest\View(StatusCode = 201)
      * @ParamConverter("customer", converter="fos_rest.request_body")
      */
     public function register(Customer $customer, EntityManagerInterface $entityManager,UserPasswordEncoderInterface $encoder)
@@ -25,6 +26,6 @@ class AuthController extends AbstractController
         $entityManager->persist($customer);
         $entityManager->flush();
 
-        return new Response('registered',200);
+        return new Response('registered');
     }
 }

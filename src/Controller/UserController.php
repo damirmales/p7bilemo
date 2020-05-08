@@ -21,6 +21,10 @@ class UserController extends AbstractController
     private $userRepo;
     private $requestedUser;
 
+    /**
+     * UserController constructor.
+     * @param UserRepository $repository
+     */
     public function __construct(UserRepository $repository)
     {
         $this->userRepo = $repository;
@@ -57,7 +61,7 @@ class UserController extends AbstractController
     {
         $this->setRequestedUser($user);
 
-        return $cache->get('users', function (ItemInterface $item) {
+        return $cache->get('users'.$user->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
             $item->tag(['users']);
 
