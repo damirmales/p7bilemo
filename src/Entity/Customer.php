@@ -26,6 +26,7 @@ class Customer implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $name;
 
@@ -37,13 +38,14 @@ class Customer implements UserInterface
 
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="string")
      */
-    private $status;
+    private $role;
 
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $password;
 
@@ -58,7 +60,6 @@ class Customer implements UserInterface
      *
      */
     private $products;
-
 
 
     /**
@@ -116,21 +117,24 @@ class Customer implements UserInterface
     }
 
 
+
     /**
-     * @return bool|null
+     * @return array
      */
-    public function getStatus(): ?bool
+    public function getRole(): array
     {
-        return $this->status;
+        return [$this->role];
     }
 
     /**
-     * @param bool $status
+     * @param string $role
      * @return $this
      */
-    public function setStatus(bool $status): self
+    public function setRole(string $role): self
     {
-        $this->status = $status;
+        if ($role === null) {
+            $this->role = ["ROLE_USER"];
+        } else $this->role = $role;
 
         return $this;
     }
@@ -219,6 +223,10 @@ class Customer implements UserInterface
         return $this;
     }
 
+    /**
+     * @param Product $product
+     * @return $this
+     */
     public function addProducts(Product $product): self
     {
         if (!$this->products->contains($product)) {
@@ -228,6 +236,10 @@ class Customer implements UserInterface
         return $this;
     }
 
+    /**
+     * @param Product $product
+     * @return $this
+     */
     public function removeProducts(Product $product): self
     {
         if ($this->products->contains($product)) {
@@ -237,21 +249,33 @@ class Customer implements UserInterface
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getRoles()
     {
-         return ['ROLE_USER'];
+        return [$this->role];
     }
 
+    /**
+     * @return string|void|null
+     */
     public function getSalt()
     {
 
     }
 
+    /**
+     * @return string
+     */
     public function getUsername()
     {
         return $this->email;
     }
 
+    /**
+     *
+     */
     public function eraseCredentials()
     {
 

@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,11 +22,13 @@ class User
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $lastName;
 
@@ -42,16 +43,6 @@ class User
      * @ORM\JoinColumn(nullable=false)
      */
     private $customer;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $status;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $password;
 
 
 
@@ -121,45 +112,6 @@ class User
         return $this;
     }
 
-
-    /**
-     * @return bool|null
-     */
-    public function getStatus(): ?bool
-    {
-        return $this->status;
-    }
-
-    /**
-     * @param bool $status
-     * @return $this
-     */
-    public function setStatus(bool $status): self
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-
-    /**
-     * @return string|null
-     */
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    /**
-     * @param string $password
-     * @return $this
-     */
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
-    }
 
     /**
      * @return Customer

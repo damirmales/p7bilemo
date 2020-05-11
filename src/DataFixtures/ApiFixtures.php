@@ -14,41 +14,51 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 class ApiFixtures extends Fixture
 {
 
+
+
     /**
      * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {
-        $customer = new Customer();
-        $user = new User();
 
-        for ($i = 0; $i < 6; $i++) {
+
+
+        for ($i = 0; $i < 4; $i++) {
             $product = new Product();
 
             $product->setName('phone_' . $i)
                 ->setPrice(mt_rand(100, 300))
+                ->setDescription("Ce smartphone est équipé d'un écran 5,1 pouces Full HD, 
+                du processeur quatre coeurs Snapdragon 801 à 2,5 Ghz de Qualcomm et d'un capteur photo 16 mégapixels")
                 ->setCreatedAt(new \DateTime());
 
             $manager->persist($product);
-
-            //add product to Customer
-            $customer->addProducts($product)
-                ->setName('customer'.$i)
-                ->setEmail('email_' . $i . '@customer.fr')
-                ->setStatus(1)
-                ->setPassword('motdepasse');
-
-            //add Customer to User
-            $user->setFirstName('bill_' . $i)
-                ->setLastName('hobbes_' . $i)
-                ->setEmail('email_' . $i . '@gemel.com')
-                ->setCustomer($customer)
-                ->setStatus(1)
-                ->setPassword('pswd');
         }
+            for ($i = 0; $i < 2; $i++) {
+                $customer = new Customer();
+                //add product to Customer
+                $customer->addProducts($product)
+                    ->setName('customer' . $i)
+                    ->setEmail('email_' . $i . '@customer.fr')
+                    ->setRole('ROLE_USER')
+                    ->setPassword('motdepasse');
 
-        $manager->persist($customer);
-        $manager->persist($user);
-        $manager->flush();
+                $manager->persist($customer);
+            }
+
+            for ($i = 0; $i < 3; $i++) {
+                $user = new User();
+                //add Customer to User
+                $user->setFirstName('bill_' . $i)
+                    ->setLastName('hobbes_' . $i)
+                    ->setEmail('email_' . $i . '@gemel.com')
+                    ->setCustomer($customer);
+
+                $manager->persist($user);
+            }
+
+            $manager->flush();
+
     }
 }

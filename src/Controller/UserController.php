@@ -9,13 +9,20 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
-
+/**
+ * Permet de gérer les requêtes sur les utilisateurs
+ * Class UserController
+ * @package App\Controller
+ */
 class UserController extends AbstractController
 {
     private $userRepo;
@@ -37,12 +44,12 @@ class UserController extends AbstractController
      * @param TagAwareCacheInterface $cache
      * @return mixed
      * @throws \Psr\Cache\InvalidArgumentException
+     * @Security("is_granted('ROLE_USER') ")
      */
     public function users(TagAwareCacheInterface $cache)
     {
         return $cache->get('users', function (ItemInterface $item) {
             $item->expiresAfter(1800);
-            $item->tag(['users']);
             $customer = $this->getUser();
             $usersOfCustomer = $this->userRepo->findBy(['customer' => $customer]);
             return $usersOfCustomer;
@@ -56,23 +63,21 @@ class UserController extends AbstractController
      * @View(StatusCode = 200)
      * @param User $user
      * @return User
+     * @Security("is_granted('ROLE_USER') ")
      */
     public function getOneUser(User $user, TagAwareCacheInterface $cache)
     {
         $this->setRequestedUser($user);
 
-        return $cache->get('users'.$user->getId(), function (ItemInterface $item) {
+        return $cache->get('users'.$this->requestedUser->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
-            $item->tag(['users']);
 
             if ($this->getUser()->getId() == $this->getRequestedUser()->getCustomer()->getId()) {
                 return $this->getRequestedUser();
             } else {
-                return new Response('Cet utilisateur ne vous appartient pas');
+                return new Response('Cet utilisateur ne vous appartient pas',403);
             }
-
         });
-
     }
 
     /**
@@ -82,9 +87,12 @@ class UserController extends AbstractController
      * @param User $user
      * @param EntityManagerInterface $entityManager
      *
-     * @return User
+     * @return User|Response
+     * @Security("is_granted('ROLE_USER') ")
      */
-    public function createUser(User $user, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
+    public function createUser(Request $request, User $user,
+                               EntityManagerInterface $entityManager, TagAwareCacheInterface $cache,
+                               ValidatorInterface $validator)
     {
         $user->setCustomer($this->getUser());
 
@@ -104,6 +112,7 @@ class UserController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @param TagAwareCacheInterface $cache
      * @return User|Response
+     * @Security("is_granted('ROLE_USER') ")
      */
     public function updateUser(User $user, User $updatedUser, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
@@ -115,8 +124,6 @@ class UserController extends AbstractController
             $user->setFirstname($updatedUser->getFirstname());
             $user->setLastname($updatedUser->getLastname());
             $user->setEmail($updatedUser->getEmail());
-            $user->setStatus($updatedUser->getStatus());
-            $user->setPassword($updatedUser->getPassword());
 
             $entityManager->flush();
             return $user;
@@ -131,10 +138,11 @@ class UserController extends AbstractController
      * @View(StatusCode = 200)
      * @param User $user
      * @param EntityManagerInterface $entityManager
+     * @Security("is_granted('ROLE_USER') ")
      */
     public function deleteUser(User $user, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
-        $cache->delete('users');
+        $cache->delete('users'.$this->requestedUser->getId());
         $requestedUser = $user;
         if ($this->getUser()->getId() == $requestedUser->getCustomer()->getId()) {
             $entityManager->remove($user);
@@ -142,7 +150,6 @@ class UserController extends AbstractController
 
         } else {
             return new Response('Cet utilisateur ne vous appartient pas');
-
         }
         return new JsonResponse(['message' => 'Utilisateur supprimé']);
 }
