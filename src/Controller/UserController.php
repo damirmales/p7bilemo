@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\View;
+use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -46,15 +47,22 @@ class UserController extends AbstractController
      * @throws \Psr\Cache\InvalidArgumentException
      * @Security("is_granted('ROLE_USER') ")
      */
-    public function users(TagAwareCacheInterface $cache)
+    public function users(Request $request, PaginatorInterface $paginator, TagAwareCacheInterface $cache)
     {
-        return $cache->get('users', function (ItemInterface $item) {
+        $data = $cache->get('users', function (ItemInterface $item) {
             $item->expiresAfter(1800);
             $customer = $this->getUser();
             $usersOfCustomer = $this->userRepo->findBy(['customer' => $customer]);
             return $usersOfCustomer;
         });
 
+        $pagineData = $paginator->paginate(
+            $data,
+            $request->query->getInt('page', 1),
+            1/*limit per page*/
+        );
+
+        return $pagineData;
     }
 
 

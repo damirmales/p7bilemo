@@ -9,9 +9,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\View;
+use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -47,9 +49,9 @@ class ProductController extends AbstractController
      * @throws \Psr\Cache\InvalidArgumentException
      * @Security("is_granted('ROLE_USER')")
      */
-    public function products(TagAwareCacheInterface $cache)
+    public function products(Request $request, PaginatorInterface $paginator, TagAwareCacheInterface $cache)
     {
-        return $cache->get('products' . $this->getUser()->getId(), function (ItemInterface $item) {
+        $data = $cache->get('products' . $this->getUser()->getId(), function (ItemInterface $item) {
            $item->expiresAfter(1800);
             $loggedUser = $this->getUser();
             $repository = $this->manager->getRepository(Product::class);
@@ -59,9 +61,17 @@ class ProductController extends AbstractController
                 ->setParameter('loggedUser', $this->getUser()->getId())
                 ->getQuery()->getResult();
 
-            return $query;
+            //return $query;
+
         });
 
+        $pagineData = $paginator->paginate(
+            $data,
+            $request->query->getInt('page', 1),
+            1/*limit per page*/
+        );
+
+        return $pagineData;
     }
 
     /**
@@ -89,7 +99,6 @@ class ProductController extends AbstractController
         $i = 0;
         while ($i < $count) {
             if ($query[$i]->getId() == $product->getId()) {
-
                 return $query[$i];
             }
             $i++;
