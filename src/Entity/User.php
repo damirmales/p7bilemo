@@ -22,19 +22,19 @@ class User
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message="Ce champ doit être renseigné")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message="Ce champ doit être renseigné")
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Email
+     * @Assert\Email( message = "Cet email '{{ value }}' n'est pas au format valide.")
      */
     private $email;
 
@@ -43,8 +43,6 @@ class User
      * @ORM\JoinColumn(nullable=false)
      */
     private $customer;
-
-
 
 
     /**

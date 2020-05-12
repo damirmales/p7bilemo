@@ -8,6 +8,7 @@
         "doctrine/data-fixtures": "^1.4",
         "friendsofsymfony/rest-bundle": "^2.7",
         "jms/serializer-bundle": "^3.5",
+        "knplabs/knp-paginator-bundle": "^5.2",
         "lexik/jwt-authentication-bundle": "^2.6",
         "sensio/framework-extra-bundle": "^5.5",
         "symfony/cache": "4.4.*",
