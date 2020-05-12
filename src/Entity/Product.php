@@ -21,12 +21,13 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank
+     * @Assert\NotBlank(message="Ce champ doit être renseigné")
      */
     private $name;
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     *
      */
     private $description;
 
