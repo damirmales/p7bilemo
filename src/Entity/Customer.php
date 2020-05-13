@@ -32,6 +32,7 @@ class Customer implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Ce champ doit être renseigné")
      * @Assert\Email( message = "Cet email '{{ value }}' n'est pas au format valide.")
      */
     private $email;

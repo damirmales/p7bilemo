@@ -48,6 +48,7 @@ class ProductController extends AbstractController
      * @return mixed
      * @throws \Psr\Cache\InvalidArgumentException
      * @Security("is_granted('ROLE_USER')")
+     * @Rest\Link()
      */
     public function products(Request $request, PaginatorInterface $paginator, TagAwareCacheInterface $cache)
     {
@@ -146,7 +147,7 @@ class ProductController extends AbstractController
 
             return $product;
         } else {
-            return new Response("erreur addproducts", 403);
+            return new Response("Erreur lors de l'ajout du client au produit", 403);
         }
     }
 }

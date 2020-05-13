@@ -6,9 +6,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
+ * @Hateoas\Relation("self", href = "expr('/products/' ~ object.getId())")
  */
 class Product
 {
@@ -33,6 +35,7 @@ class Product
 
     /**
      * @ORM\Column(type="float", nullable=true)
+     * @Assert\Range(min="100", max="1000")
      */
     private $price;
 
