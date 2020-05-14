@@ -5,11 +5,13 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
  * @ORM\Entity
  * @UniqueEntity("email")
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @Hateoas\Relation("self", href = "expr('/users/' ~ object.getId())")
  */
 class User
 {
@@ -34,6 +36,7 @@ class User
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Ce champ doit être renseigné")
      * @Assert\Email( message = "Cet email '{{ value }}' n'est pas au format valide.")
      */
     private $email;

@@ -98,10 +98,16 @@ class UserController extends AbstractController
      * @return User|Response
      * @Security("is_granted('ROLE_USER') ")
      */
-    public function createUser(Request $request, User $user,
+    public function createUser(User $user,
                                EntityManagerInterface $entityManager, TagAwareCacheInterface $cache,
                                ValidatorInterface $validator)
     {
+        $errors = $validator->validate($user);
+        if (count($errors) > 0) {
+            $errorsString = (string)$errors;
+            return new Response($errorsString, 403);
+        }
+
         $user->setCustomer($this->getUser());
 
         $entityManager->persist($user);

@@ -1,0 +1,11 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Api Bilemo projet 7
+            description: This is an app about Bilemo phones
+            version: 1.0.0
+    areas: # to filter documented areas
+        path_patterns:
+            #- ^/(?!/doc$) # Accepts routes under /api except /api/doc
+            - ^/products
+            - ^/users
