@@ -83,7 +83,8 @@ class UserController extends AbstractController
             if ($this->getUser()->getId() == $this->getRequestedUser()->getCustomer()->getId()) {
                 return $this->getRequestedUser();
             } else {
-                return new Response('Cet utilisateur ne vous appartient pas', 403);
+
+                return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 403]);
             }
         });
     }
@@ -106,9 +107,9 @@ class UserController extends AbstractController
         if (count($errors) > 0) {
             $errorsString = (string)$errors;
 
-            return new Response($errorsString, 403);
+            return new JsonResponse(['message' => $errorsString, 'status' => 403]);
         }
-
+        dd($user);
         $user->setCustomer($this->getUser());
 
         $entityManager->persist($user);
@@ -144,7 +145,7 @@ class UserController extends AbstractController
             return $user;
 
         } else {
-            return new Response('Cet utilisateur ne vous appartient pas');
+              return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 403]);
         }
     }
 
@@ -158,14 +159,14 @@ class UserController extends AbstractController
     public function deleteUser(User $user, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
         $cache->delete('users' . $user->getId());
-        $requestedUser = $user;
+
         if ($this->getUser()->getId() == $user->getCustomer()->getId()) {
             $entityManager->remove($user);
             $entityManager->flush();
 
         } else {
 
-            return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 204]);
+            return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 403]);
         }
 
     }

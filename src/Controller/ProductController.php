@@ -2,17 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\Customer;
 use App\Entity\Product;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\View;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -26,7 +25,6 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 class ProductController extends AbstractController
 {
     private $productRepo;
-    private $requestedProduct;
     private $manager;
 
     /**
@@ -47,13 +45,13 @@ class ProductController extends AbstractController
      * @return mixed
      * @throws \Psr\Cache\InvalidArgumentException
      * @Security("is_granted('ROLE_USER')")
-     * @Rest\Link()
+     *
      */
     public function products(Request $request, PaginatorInterface $paginator, TagAwareCacheInterface $cache)
     {
         $data = $cache->get('products' . $this->getUser()->getId(), function (ItemInterface $item) {
            $item->expiresAfter(1800);
-            $loggedUser = $this->getUser();
+
             $repository = $this->manager->getRepository(Product::class);
             $repository->createQueryBuilder('u')
                 ->innerJoin('u.customers', 'c')
@@ -81,9 +79,6 @@ class ProductController extends AbstractController
      */
     public function getOneProduct(Product $product)
     {
-        $this->setRequestedProduct($product);
-
-        $loggedUser = $this->getUser();
         $repository = $this->manager->getRepository(Product::class);
         $query = $repository->createQueryBuilder('u')
             ->innerJoin('u.customers', 'c')
@@ -99,26 +94,7 @@ class ProductController extends AbstractController
             }
             $i++;
         }
-
-        return new Response("L'article ne vous appartient pas", 403);
+        return new JsonResponse(['message' => 'L\'article ne vous appartient pas', 'status' => 403]);
     }
-
-    /**
-     * @return mixed
-     */
-    public function getRequestedProduct()
-    {
-        return $this->requestedProduct;
-    }
-
-    /**
-     * @param mixed $requestedProduct
-     */
-    public function setRequestedProduct($requestedProduct)
-    {
-        $this->requestedProduct = $requestedProduct;
-        return $this;
-    }
-
 
 }
