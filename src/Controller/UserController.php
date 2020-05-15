@@ -164,7 +164,7 @@ class UserController extends AbstractController
         } else {
             return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 403]);
         }
-        return null;
+        return true;
     }
 
     /**
