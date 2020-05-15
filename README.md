@@ -29,6 +29,7 @@ Report the pass phrase into the lexik/jwt-authentication-bundle section of the .
 
 ## Test the API with Postman
 See this tutorial to handle the software if necessary
+
 https://openclassrooms.com/fr/courses/4668056-construisez-des-microservices/5123020-testez-votre-api-grace-a-postman
 
 ## Documentation
