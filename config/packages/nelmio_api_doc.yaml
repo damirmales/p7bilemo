@@ -4,6 +4,14 @@ nelmio_api_doc:
             title: Api Bilemo projet 7
             description: This is an app about Bilemo phones
             version: 1.0.0
+#        securityDefinitions:
+#            Bearer:
+#                type: apiKey
+#                description: 'Value: Bearer {jwt}'
+#                name: Authorization
+#                in: header
+#        security:
+#            - Bearer: []
     areas: # to filter documented areas
         path_patterns:
             #- ^/(?!/doc$) # Accepts routes under /api except /api/doc
