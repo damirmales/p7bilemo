@@ -77,13 +77,13 @@ class UserController extends AbstractController
     {
         $this->setRequestedUser($user);
 
-        return $cache->get('users'.$this->requestedUser->getId(), function (ItemInterface $item) {
+        return $cache->get('users' . $this->requestedUser->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
 
             if ($this->getUser()->getId() == $this->getRequestedUser()->getCustomer()->getId()) {
                 return $this->getRequestedUser();
             } else {
-                return new Response('Cet utilisateur ne vous appartient pas',403);
+                return new Response('Cet utilisateur ne vous appartient pas', 403);
             }
         });
     }
@@ -105,6 +105,7 @@ class UserController extends AbstractController
         $errors = $validator->validate($user);
         if (count($errors) > 0) {
             $errorsString = (string)$errors;
+
             return new Response($errorsString, 403);
         }
 
@@ -113,6 +114,7 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
         $cache->delete('users');
+
         return $user;
     }
 
@@ -122,7 +124,7 @@ class UserController extends AbstractController
      * @View(StatusCode = 200)
      * @ParamConverter("updatedUser", converter="fos_rest.request_body")
      * @param User $user
-     * @param User $updatedUser
+     * @param User $updatedUser //contains new data of the user's id
      * @param EntityManagerInterface $entityManager
      * @param TagAwareCacheInterface $cache
      * @return User|Response
@@ -130,9 +132,7 @@ class UserController extends AbstractController
      */
     public function updateUser(User $user, User $updatedUser, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
-        $requestedUser = $user;
-        $cache->delete('users');
-        if ($this->getUser()->getId() == $requestedUser->getCustomer()->getId()) {
+          if ($this->getUser()->getId() == $user->getCustomer()->getId()) {
 
             $user->setCustomer($this->getUser());
             $user->setFirstname($updatedUser->getFirstname());
@@ -140,6 +140,7 @@ class UserController extends AbstractController
             $user->setEmail($updatedUser->getEmail());
 
             $entityManager->flush();
+            $cache->delete('users' . $user->getId());
             return $user;
 
         } else {
@@ -149,24 +150,25 @@ class UserController extends AbstractController
 
     /**
      * @Rest\Delete("/users/{id}", name="delete_user")
-     * @View(StatusCode = 200)
+     * @View(StatusCode = 204)
      * @param User $user
      * @param EntityManagerInterface $entityManager
      * @Security("is_granted('ROLE_USER') ")
      */
     public function deleteUser(User $user, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
-        $cache->delete('users'.$this->requestedUser->getId());
+        $cache->delete('users' . $user->getId());
         $requestedUser = $user;
-        if ($this->getUser()->getId() == $requestedUser->getCustomer()->getId()) {
+        if ($this->getUser()->getId() == $user->getCustomer()->getId()) {
             $entityManager->remove($user);
             $entityManager->flush();
 
         } else {
-            return new Response('Cet utilisateur ne vous appartient pas');
+
+            return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 204]);
         }
-        return new JsonResponse(['message' => 'Utilisateur supprimé']);
-}
+
+    }
 
     /**
      * @return mixed
