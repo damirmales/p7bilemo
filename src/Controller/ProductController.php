@@ -59,11 +59,10 @@ class ProductController extends AbstractController
                 ->setParameter('loggedUser', $this->getUser()->getId())
                 ->getQuery()->getResult();
         });
-
         $pagineData = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
-            1/*limit per page*/
+            20/*limit per page*/
         );
 
         return $pagineData;
