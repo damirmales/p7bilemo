@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
  * Class AuthController
  * @package App\Controller
  */
-class AuthController extends AbstractController
+class RegisterController extends AbstractController
 {
     /**
      * @Rest\Post("/register", name="auth")
