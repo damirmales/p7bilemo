@@ -96,5 +96,4 @@ class ProductController extends AbstractController
         }
         return new JsonResponse(['message' => 'L\'article ne vous appartient pas', 'status' => 403]);
     }
-
 }

@@ -11,7 +11,8 @@ use Hateoas\Configuration\Annotation as Hateoas;
  * @ORM\Entity
  * @UniqueEntity("email")
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @Hateoas\Relation("self", href = "expr('/users/' ~ object.getId())")
+ * @Hateoas\Relation("self", href = @Hateoas\Route("one_user", parameters = {"id" = "expr(object.getId())"}, absolute = true))
+ *
  */
 class User
 {

@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -36,7 +37,6 @@ class UserController extends AbstractController
     public function __construct(UserRepository $repository)
     {
         $this->userRepo = $repository;
-
     }
 
     /**
@@ -64,7 +64,6 @@ class UserController extends AbstractController
 
         return $pagineData;
     }
-
 
     /**
      * @Get("/users/{id}", name="one_user")
@@ -107,11 +106,10 @@ class UserController extends AbstractController
         if (count($errors) > 0) {
             $errorsString = (string)$errors;
 
-            return new JsonResponse(['message' => $errorsString, 'status' => 403]);
+            throw new HttpException(400, $errors);
         }
-        dd($user);
-        $user->setCustomer($this->getUser());
 
+        $user->setCustomer($this->getUser());
         $entityManager->persist($user);
         $entityManager->flush();
         $cache->delete('users');
@@ -159,16 +157,14 @@ class UserController extends AbstractController
     public function deleteUser(User $user, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
         $cache->delete('users' . $user->getId());
-
         if ($this->getUser()->getId() == $user->getCustomer()->getId()) {
             $entityManager->remove($user);
             $entityManager->flush();
 
         } else {
-
             return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 403]);
         }
-
+        return true;
     }
 
     /**
