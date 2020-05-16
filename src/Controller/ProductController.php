@@ -50,7 +50,7 @@ class ProductController extends AbstractController
     public function products(Request $request, PaginatorInterface $paginator, TagAwareCacheInterface $cache)
     {
         $data = $cache->get('products' . $this->getUser()->getId(), function (ItemInterface $item) {
-           $item->expiresAfter(1800);
+            $item->expiresAfter(1800);
 
             $repository = $this->manager->getRepository(Product::class);
             $repository->createQueryBuilder('u')
@@ -74,25 +74,15 @@ class ProductController extends AbstractController
      * @Security("is_granted('ROLE_USER') ")
      * @Cache(expires="tomorrow")
      * @param Product $product
-     * @return Response
+     * @return Product
      */
     public function getOneProduct(Product $product)
     {
-        $repository = $this->manager->getRepository(Product::class);
-        $query = $repository->createQueryBuilder('u')
-            ->innerJoin('u.customers', 'c')
-            ->where('c.id = :loggedUser')
-            ->setParameter('loggedUser', $this->getUser()->getId())
-            ->getQuery()->getResult();
-
-        $count = count($query);
-        $i = 0;
-        while ($i < $count) {
-            if ($query[$i]->getId() == $product->getId()) {
-                return $query[$i];
+            foreach ($product->getCustomers() as $item) {
+                if ($item === $this->getUser()) {
+                    return $product;
+                }
             }
-            $i++;
-        }
-        return new JsonResponse(['message' => 'L\'article ne vous appartient pas', 'status' => 403]);
+            return new JsonResponse(['message' => 'L\'article ne vous appartient pas', 'status' => 403]);
     }
 }
