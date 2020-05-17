@@ -8,12 +8,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\View;
 use Knp\Component\Pager\PaginatorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -26,6 +24,7 @@ class ProductController extends AbstractController
 {
     private $productRepo;
     private $manager;
+    private $product;
 
     /**
      * ProductController constructor.
@@ -44,14 +43,12 @@ class ProductController extends AbstractController
      * @param TagAwareCacheInterface $cache
      * @return mixed
      * @throws \Psr\Cache\InvalidArgumentException
-     * @Security("is_granted('ROLE_USER')")
-     *
+     * @Security("is_granted('ROLE_USER')")     *
      */
     public function products(Request $request, PaginatorInterface $paginator, TagAwareCacheInterface $cache)
     {
         $data = $cache->get('products' . $this->getUser()->getId(), function (ItemInterface $item) {
-           $item->expiresAfter(1800);
-
+            $item->expiresAfter(1800);
             $repository = $this->manager->getRepository(Product::class);
             $repository->createQueryBuilder('u')
                 ->innerJoin('u.customers', 'c')
@@ -72,27 +69,18 @@ class ProductController extends AbstractController
      * @Get("/products/{id}", name="one_product")
      * @View
      * @Security("is_granted('ROLE_USER') ")
-     * @Cache(expires="tomorrow")
      * @param Product $product
-     * @return Response
+     * @return Product
      */
-    public function getOneProduct(Product $product)
+    public function getOneProduct(Product $product, TagAwareCacheInterface $cache)
     {
-        $repository = $this->manager->getRepository(Product::class);
-        $query = $repository->createQueryBuilder('u')
-            ->innerJoin('u.customers', 'c')
-            ->where('c.id = :loggedUser')
-            ->setParameter('loggedUser', $this->getUser()->getId())
-            ->getQuery()->getResult();
-
-        $count = count($query);
-        $i = 0;
-        while ($i < $count) {
-            if ($query[$i]->getId() == $product->getId()) {
-                return $query[$i];
+        $this->product = $product;
+        return $cache->get('products' . $product->getId(), function (ItemInterface $item) {
+            $item->expiresAfter(1800);
+            if ($this->product->getCustomers()->contains($this->getUser())) {
+                return $this->product;
             }
-            $i++;
-        }
-        return new JsonResponse(['message' => 'L\'article ne vous appartient pas', 'status' => 403]);
+            return new JsonResponse(['message' => 'L\'article ne vous appartient pas', 'status' => 403]);
+        });
     }
 }

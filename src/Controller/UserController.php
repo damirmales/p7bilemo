@@ -82,7 +82,6 @@ class UserController extends AbstractController
             if ($this->getUser()->getId() == $this->getRequestedUser()->getCustomer()->getId()) {
                 return $this->getRequestedUser();
             } else {
-
                 return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 403]);
             }
         });
@@ -99,7 +98,8 @@ class UserController extends AbstractController
      * @Security("is_granted('ROLE_USER') ")
      */
     public function createUser(User $user,
-                               EntityManagerInterface $entityManager, TagAwareCacheInterface $cache,
+                               EntityManagerInterface $entityManager,
+                               TagAwareCacheInterface $cache,
                                ValidatorInterface $validator)
     {
         $errors = $validator->validate($user);
