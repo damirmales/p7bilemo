@@ -8,12 +8,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\View;
 use Knp\Component\Pager\PaginatorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -44,14 +42,12 @@ class ProductController extends AbstractController
      * @param TagAwareCacheInterface $cache
      * @return mixed
      * @throws \Psr\Cache\InvalidArgumentException
-     * @Security("is_granted('ROLE_USER')")
-     *
+     * @Security("is_granted('ROLE_USER')")     *
      */
     public function products(Request $request, PaginatorInterface $paginator, TagAwareCacheInterface $cache)
     {
         $data = $cache->get('products' . $this->getUser()->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
-
             $repository = $this->manager->getRepository(Product::class);
             $repository->createQueryBuilder('u')
                 ->innerJoin('u.customers', 'c')
@@ -71,18 +67,20 @@ class ProductController extends AbstractController
     /**
      * @Get("/products/{id}", name="one_product")
      * @View
-     * @Security("is_granted('ROLE_USER') ")
-     * @Cache(expires="tomorrow")
+     * @Security("is_granted('ROLE_USER') ")     *
      * @param Product $product
      * @return Product
      */
-    public function getOneProduct(Product $product)
+    public function getOneProduct(Product $product,TagAwareCacheInterface $cache)
     {
+        return $cache->get('products'.$product->getId(), function (ItemInterface $item, $product) {
+            $item->expiresAfter(1800);
             foreach ($product->getCustomers() as $item) {
                 if ($item === $this->getUser()) {
                     return $product;
                 }
             }
             return new JsonResponse(['message' => 'L\'article ne vous appartient pas', 'status' => 403]);
+        });
     }
 }
