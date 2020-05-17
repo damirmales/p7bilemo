@@ -24,6 +24,7 @@ class ProductController extends AbstractController
 {
     private $productRepo;
     private $manager;
+    private $product;
 
     /**
      * ProductController constructor.
@@ -67,18 +68,17 @@ class ProductController extends AbstractController
     /**
      * @Get("/products/{id}", name="one_product")
      * @View
-     * @Security("is_granted('ROLE_USER') ")     *
+     * @Security("is_granted('ROLE_USER') ")
      * @param Product $product
      * @return Product
      */
-    public function getOneProduct(Product $product,TagAwareCacheInterface $cache)
+    public function getOneProduct(Product $product, TagAwareCacheInterface $cache)
     {
-        return $cache->get('products'.$product->getId(), function (ItemInterface $item, $product) {
+        $this->product = $product;
+        return $cache->get('products' . $product->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
-            foreach ($product->getCustomers() as $item) {
-                if ($item === $this->getUser()) {
-                    return $product;
-                }
+            if ($this->product->getCustomers()->contains($this->getUser())) {
+                return $this->product;
             }
             return new JsonResponse(['message' => 'L\'article ne vous appartient pas', 'status' => 403]);
         });
