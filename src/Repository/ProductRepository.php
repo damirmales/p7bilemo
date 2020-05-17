@@ -24,5 +24,20 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    /**
+     * Retrieve all products associated with a logged customer
+     * @param $repository
+     * @param $userId
+     * @return mixed
+     */
+    public function getProducts($repository,$userId)
+    {
+        $query= $repository->createQueryBuilder('u')
+             ->innerJoin('u.customers', 'c')
+             ->where('c.id = :loggedUser')
+             ->setParameter('loggedUser', $userId)
+             ->getQuery()->getResult();
 
+             return $query;
+    }
 }

@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Manager\Paginate;
+use App\Manager\ProductManager;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -25,15 +27,21 @@ class ProductController extends AbstractController
     private $productRepo;
     private $manager;
     private $product;
+    private $paginator;
 
     /**
      * ProductController constructor.
      * @param ProductRepository $productRepository
+     * @param EntityManagerInterface $entityManager
+     * @param PaginatorInterface $paginator
      */
-    public function __construct(ProductRepository $productRepository, EntityManagerInterface $entityManager)
+    public function __construct(ProductRepository $productRepository,
+                                EntityManagerInterface $entityManager,
+                                PaginatorInterface $paginator)
     {
         $this->productRepo = $productRepository;
         $this->manager = $entityManager;
+        $this->paginator = $paginator;
     }
 
     /**
@@ -45,24 +53,20 @@ class ProductController extends AbstractController
      * @throws \Psr\Cache\InvalidArgumentException
      * @Security("is_granted('ROLE_USER')")     *
      */
-    public function products(Request $request, PaginatorInterface $paginator, TagAwareCacheInterface $cache)
+    public function products(Request $request, TagAwareCacheInterface $cache)
     {
+        $limitPerPage = 10; //number of product per page paginate
+
         $data = $cache->get('products' . $this->getUser()->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
-            $repository = $this->manager->getRepository(Product::class);
-            $repository->createQueryBuilder('u')
-                ->innerJoin('u.customers', 'c')
-                ->where('c.id = :loggedUser')
-                ->setParameter('loggedUser', $this->getUser()->getId())
-                ->getQuery()->getResult();
-        });
-        $pagineData = $paginator->paginate(
-            $data,
-            $request->query->getInt('page', 1),
-            20/*limit per page*/
-        );
 
-        return $pagineData;
+            return $this->productRepo->getProducts($this->productRepo, $this->getUser()->getId());
+
+        });
+
+        $pagine = new Paginate($this->paginator, $data, $request);
+
+        return $pagine->pagination($limitPerPage);
     }
 
     /**
@@ -77,10 +81,8 @@ class ProductController extends AbstractController
         $this->product = $product;
         return $cache->get('products' . $product->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
-            if ($this->product->getCustomers()->contains($this->getUser())) {
-                return $this->product;
-            }
-            return new JsonResponse(['message' => 'L\'article ne vous appartient pas', 'status' => 403]);
+            $productManager = new ProductManager();
+            $productManager->showProduct($this->product, $this->getUser());
         });
     }
 }

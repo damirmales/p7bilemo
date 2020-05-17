@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Manager\Paginate;
+use App\Manager\UserManager;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -29,14 +31,25 @@ class UserController extends AbstractController
 {
     private $userRepo;
     private $requestedUser;
+    private $user;
+    private $paginator;
+    private $entityManager;
+    private $validator;
 
     /**
      * UserController constructor.
      * @param UserRepository $repository
      */
-    public function __construct(UserRepository $repository)
+    public function __construct(UserRepository $repository,
+                                PaginatorInterface $paginator,
+                                EntityManagerInterface $entityManager,
+                                ValidatorInterface $validator)
     {
         $this->userRepo = $repository;
+        $this->paginator = $paginator;
+        $this->entityManager = $entityManager;
+        $this->validator = $validator;
+
     }
 
     /**
@@ -47,22 +60,20 @@ class UserController extends AbstractController
      * @throws \Psr\Cache\InvalidArgumentException
      * @Security("is_granted('ROLE_USER') ")
      */
-    public function users(Request $request, PaginatorInterface $paginator, TagAwareCacheInterface $cache)
+    public function users(Request $request, TagAwareCacheInterface $cache)
     {
+        $limitPerPage = 6; //number of product per page paginate
+
         $data = $cache->get('users', function (ItemInterface $item) {
             $item->expiresAfter(1800);
-            $customer = $this->getUser();
-            $usersOfCustomer = $this->userRepo->findBy(['customer' => $customer]);
-            return $usersOfCustomer;
+            $userManager = new UserManager();
+
+            return $userManager->showAllUsers($this->getUser(), $this->userRepo);
         });
 
-        $pagineData = $paginator->paginate(
-            $data,
-            $request->query->getInt('page', 1),
-            1/*limit per page*/
-        );
+        $pagine = new Paginate($this->paginator, $data, $request);
 
-        return $pagineData;
+        return $pagine->pagination($limitPerPage);
     }
 
     /**
@@ -74,16 +85,14 @@ class UserController extends AbstractController
      */
     public function getOneUser(User $user, TagAwareCacheInterface $cache)
     {
-        $this->setRequestedUser($user);
+        $this->requestedUser = $user;
 
-        return $cache->get('users' . $this->requestedUser->getId(), function (ItemInterface $item) {
+        return $cache->get('users' . $user->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
+            $userManager = new UserManager();
 
-            if ($this->getUser()->getId() == $this->getRequestedUser()->getCustomer()->getId()) {
-                return $this->getRequestedUser();
-            } else {
-                return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 403]);
-            }
+            return $userManager->showUser($this->getUser()->getId(), $this->requestedUser);
+
         });
     }
 
@@ -97,24 +106,13 @@ class UserController extends AbstractController
      * @return User|Response
      * @Security("is_granted('ROLE_USER') ")
      */
-    public function createUser(User $user,
-                               EntityManagerInterface $entityManager,
-                               TagAwareCacheInterface $cache,
-                               ValidatorInterface $validator)
+    public function createUser(User $user, TagAwareCacheInterface $cache)
     {
-        $errors = $validator->validate($user);
-        if (count($errors) > 0) {
-            $errorsString = (string)$errors;
-
-            throw new HttpException(400, $errors);
-        }
-
-        $user->setCustomer($this->getUser());
-        $entityManager->persist($user);
-        $entityManager->flush();
         $cache->delete('users');
+        $this->user = $user;
+        $userManager = new UserManager();
 
-        return $user;
+        return $userManager->createUser($this->getUser(), $this->user, $this->validator, $this->entityManager);
     }
 
 
@@ -129,22 +127,11 @@ class UserController extends AbstractController
      * @return User|Response
      * @Security("is_granted('ROLE_USER') ")
      */
-    public function updateUser(User $user, User $updatedUser, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
+    public function updateUser(User $user, User $updatedUser, EntityManagerInterface $entityManager)
     {
-          if ($this->getUser()->getId() == $user->getCustomer()->getId()) {
+        $updateUser = new UserManager();
 
-            $user->setCustomer($this->getUser());
-            $user->setFirstname($updatedUser->getFirstname());
-            $user->setLastname($updatedUser->getLastname());
-            $user->setEmail($updatedUser->getEmail());
-
-            $entityManager->flush();
-            $cache->delete('users' . $user->getId());
-            return $user;
-
-        } else {
-              return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 403]);
-        }
+        return $updateUser->updateUser($this->getUser(), $user, $updatedUser, $this->validator, $entityManager);
     }
 
     /**
@@ -157,32 +144,9 @@ class UserController extends AbstractController
     public function deleteUser(User $user, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
         $cache->delete('users' . $user->getId());
-        if ($this->getUser()->getId() == $user->getCustomer()->getId()) {
-            $entityManager->remove($user);
-            $entityManager->flush();
 
-        } else {
-            return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 403]);
-        }
-        return true;
+        $updateUser = new UserManager();
+
+        return $updateUser->deleteUser($this->getUser(), $user, $entityManager);
     }
-
-    /**
-     * @return mixed
-     */
-    public function getRequestedUser()
-    {
-        return $this->requestedUser;
-    }
-
-    /**
-     * @param mixed $requestedUser
-     */
-    public function setRequestedUser($requestedUser)
-    {
-        $this->requestedUser = $requestedUser;
-
-        return $this;
-    }
-
 }
