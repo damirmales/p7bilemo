@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Customer;
+use App\Manager\RegisterManager;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -23,12 +24,8 @@ class RegisterController extends AbstractController
      */
     public function register(Customer $customer, EntityManagerInterface $entityManager,UserPasswordEncoderInterface $encoder)
     {
-        $password = $customer->getPassword();
-        $encoded = $encoder->encodePassword($customer, $password);
-        $customer->setPassword($encoded);
-        $entityManager->persist($customer);
-        $entityManager->flush();
+        $registerManager = new RegisterManager();
 
-        return $customer;
+        return $registerManager->register($customer,$entityManager, $encoder);
     }
 }
