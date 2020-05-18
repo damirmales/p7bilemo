@@ -15,7 +15,6 @@ class ProductManager
     public function showProduct($product, $customer)
     {
         $this->product = $product;
-
         if ($this->product->getCustomers()->contains($customer)) {
             return $this->product;
         }

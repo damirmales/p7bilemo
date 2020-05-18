@@ -82,7 +82,8 @@ class ProductController extends AbstractController
         return $cache->get('products' . $product->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
             $productManager = new ProductManager();
-            $productManager->showProduct($this->product, $this->getUser());
+
+          return $productManager->showProduct($this->product, $this->getUser());
         });
     }
 }
