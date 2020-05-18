@@ -3,12 +3,15 @@
 
 namespace App\Manager;
 
-
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ProductManager
 {
-
+    /**
+     * @param $product
+     * @param $customer
+     * @return JsonResponse
+     */
     public function showProduct($product, $customer)
     {
         $this->product = $product;
@@ -17,7 +20,5 @@ class ProductManager
             return $this->product;
         }
         return new JsonResponse(['message' => 'L\'article ne vous appartient pas', 'status' => 403]);
-
     }
-
 }

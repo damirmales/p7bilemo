@@ -10,6 +10,11 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class UserManager
 {
 
+    /**
+     * @param $customer
+     * @param $userRepo
+     * @return mixed
+     */
     public function showAllUsers($customer, $userRepo)
     {
         $custom = $customer;

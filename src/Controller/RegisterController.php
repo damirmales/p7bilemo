@@ -21,8 +21,14 @@ class RegisterController extends AbstractController
      * @Rest\Post("/register", name="auth")
      * @Rest\View(StatusCode = 201)
      * @ParamConverter("customer", converter="fos_rest.request_body")
+     * @param Customer $customer
+     * @param EntityManagerInterface $entityManager
+     * @param UserPasswordEncoderInterface $encoder
+     * @return mixed
      */
-    public function register(Customer $customer, EntityManagerInterface $entityManager,UserPasswordEncoderInterface $encoder)
+    public function register(Customer $customer,
+                             EntityManagerInterface $entityManager,
+                             UserPasswordEncoderInterface $encoder)
     {
         $registerManager = new RegisterManager();
 

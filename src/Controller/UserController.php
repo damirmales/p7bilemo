@@ -14,10 +14,8 @@ use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -39,6 +37,9 @@ class UserController extends AbstractController
     /**
      * UserController constructor.
      * @param UserRepository $repository
+     * @param PaginatorInterface $paginator
+     * @param EntityManagerInterface $entityManager
+     * @param ValidatorInterface $validator
      */
     public function __construct(UserRepository $repository,
                                 PaginatorInterface $paginator,
@@ -92,7 +93,6 @@ class UserController extends AbstractController
             $userManager = new UserManager();
 
             return $userManager->showUser($this->getUser()->getId(), $this->requestedUser);
-
         });
     }
 
