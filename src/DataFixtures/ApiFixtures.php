@@ -17,10 +17,15 @@ class ApiFixtures extends Fixture
 {
     private $encoder;
 
+    /**
+     * ApiFixtures constructor.
+     * @param UserPasswordEncoderInterface $encoder
+     */
     public function __construct(UserPasswordEncoderInterface $encoder)
     {
         $this->encoder = $encoder;
     }
+
     /**
      * @param ObjectManager $manager
      */
@@ -30,8 +35,9 @@ class ApiFixtures extends Fixture
             $product = new Product();
             $product->setName('phone_' . $i)
                 ->setPrice(mt_rand(100, 300))
-                ->setDescription("Ce smartphone est équipé d'un écran 5,1 pouces Full HD, 
-                du processeur quatre coeurs Snapdragon 801 à 2,5 Ghz de Qualcomm et d'un capteur photo 16 mégapixels")
+                ->setDescription("Ce smartphone est équipé d'un écran 5,1 pouces Full HD,
+                 du processeur quatre coeurs Snapdragon 801 à 2,5 Ghz de Qualcomm et d'un capteur photo 16 mégapixels")
+
                 ->setCreatedAt(new \DateTime());
             $manager->persist($product);
         }

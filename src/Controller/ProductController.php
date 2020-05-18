@@ -12,7 +12,6 @@ use FOS\RestBundle\Controller\Annotations\View;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -79,10 +78,12 @@ class ProductController extends AbstractController
     public function getOneProduct(Product $product, TagAwareCacheInterface $cache)
     {
         $this->product = $product;
+
         return $cache->get('products' . $product->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
             $productManager = new ProductManager();
-            $productManager->showProduct($this->product, $this->getUser());
+
+          return $productManager->showProduct($this->product, $this->getUser());
         });
     }
 }

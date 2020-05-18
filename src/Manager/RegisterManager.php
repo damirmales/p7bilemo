@@ -7,6 +7,12 @@ namespace App\Manager;
 class RegisterManager
 {
 
+    /**
+     * @param $customer
+     * @param $entityManager
+     * @param $encoder
+     * @return mixed
+     */
     public function register($customer, $entityManager, $encoder)
     {
         $password = $customer->getPassword();
@@ -17,5 +23,4 @@ class RegisterManager
 
         return $customer;
     }
-
 }

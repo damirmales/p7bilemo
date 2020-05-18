@@ -10,6 +10,12 @@ class Paginate
     private $data;
     private $request;
 
+    /**
+     * Paginate constructor.
+     * @param $paginator
+     * @param $data
+     * @param $request
+     */
     public function __construct($paginator, $data, $request)
     {
         $this->paginator = $paginator;
@@ -17,6 +23,10 @@ class Paginate
         $this->request = $request;
     }
 
+    /**
+     * @param $limitPerPage
+     * @return mixed
+     */
     public function pagination($limitPerPage)
     {
         $pagineData = $this->paginator->paginate(

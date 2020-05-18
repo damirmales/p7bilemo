@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @ORM\Entity
  * @UniqueEntity("email")
- * @ORM\Entity(repositoryClass="App\Repository\CustomerRepository")
+ *
  */
 class Customer implements UserInterface
 {
