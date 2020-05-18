@@ -11,7 +11,8 @@ use Hateoas\Configuration\Annotation as Hateoas;
  * @ORM\Entity
  * @UniqueEntity("email")
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @Hateoas\Relation("self", href = @Hateoas\Route("one_user", parameters = {"id" = "expr(object.getId())"}, absolute = true))
+ * @Hateoas\Relation("self", href = @Hateoas\Route("one_user",
+ *      parameters = {"id" = "expr(object.getId())"}, absolute = true))
  *
  */
 class User
@@ -26,12 +27,16 @@ class User
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="Ce champ doit être renseigné")
+     * @Assert\Regex(pattern="/^[^0-9][a-zA-Zàáâãäåçèéêëìíîïðòóôõöùúûüýÿ^'\x22][^'\x22&)(]+$/",
+     *      message="Ce champ doit uniquement contenir des lettres de l'alphabet")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="Ce champ doit être renseigné")
+     * @Assert\Regex(pattern="/^[^0-9][a-zA-Zàáâãäåçèéêëìíîïðòóôõöùúûüýÿ^'\x22][^'\x22&)(]+$/",
+     *      message="Ce champ doit uniquement contenir des lettres de l'alphabet")
      */
     private $lastName;
 
