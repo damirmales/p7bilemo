@@ -127,8 +127,11 @@ class UserController extends AbstractController
      * @return User|Response
      * @Security("is_granted('ROLE_USER') ")
      */
-    public function updateUser(User $user, User $updatedUser, EntityManagerInterface $entityManager)
+    public function updateUser(User $user, User $updatedUser,
+                               EntityManagerInterface $entityManager,
+                               TagAwareCacheInterface $cache)
     {
+        $cache->delete('users' . $user->getId());
         $updateUser = new UserManager();
 
         return $updateUser->updateUser($this->getUser(), $user, $updatedUser, $this->validator, $entityManager);
