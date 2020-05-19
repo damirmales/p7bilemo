@@ -3,7 +3,8 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/96e99bc8b0484136860644b310977ba0)](https://app.codacy.com/manual/d.males/p7bilemo?utm_source=github.com&utm_medium=referral&utm_content=damirmales/p7bilemo&utm_campaign=Badge_Grade_Dashboard)
 
-Install composer as it’s needed to take about depencies
+Install composer as it’s needed to take care about depencies
+With your command line launch a composer update 
 
 Configure the the .env File to access your database
 see section doctrine/doctrine-bundle 
