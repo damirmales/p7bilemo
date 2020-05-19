@@ -9,7 +9,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UserManager
 {
-
     /**
      * @param $customer
      * @param $userRepo
@@ -34,7 +33,7 @@ class UserManager
         if ($customerId == $user->getCustomer()->getId()) {
             return $user;
         }
-        return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 403]);
+        return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas'], 401);
     }
 
     /**
@@ -95,7 +94,7 @@ class UserManager
             $entityManager->remove($user);
             $entityManager->flush();
         } else {
-            return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas', 'status' => 403]);
+            return new JsonResponse(['message' => 'Cet utilisateur ne vous appartient pas'],401);
         }
     }
 

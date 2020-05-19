@@ -18,6 +18,6 @@ class ProductManager
         if ($this->product->getCustomers()->contains($customer)) {
             return $this->product;
         }
-        return new JsonResponse(['message' => 'L\'article ne vous appartient pas', 'status' => 403]);
+        return new JsonResponse(['message' => 'L\'article ne vous appartient pas'], 401);
     }
 }
