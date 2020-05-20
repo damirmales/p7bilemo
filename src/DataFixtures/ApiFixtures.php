@@ -31,8 +31,10 @@ class ApiFixtures extends Fixture
      */
     public function load(ObjectManager $manager)
     {
+        $allProducts = array();
         for ($i = 0; $i < 50; $i++) {
             $product = new Product();
+            array_push($allProducts, $product);
             $product->setName('phone_' . $i)
                 ->setPrice(mt_rand(100, 300))
                 ->setDescription("Ce smartphone est équipé d'un écran 5,1 pouces Full HD,
@@ -42,12 +44,17 @@ class ApiFixtures extends Fixture
             $manager->persist($product);
         }
 
+        $allCustomer = array();
         $password = 'motdepasse';
         for ($i = 0; $i < 2; $i++) {
             $customer = new Customer();
+
+            array_push($allCustomer, $customer);
+            $randProduct = shuffle($allProducts); //define a randomly product to add to a customer
+
             $encoded = $this->encoder->encodePassword($customer, $password);
             //add product to Customer
-            $customer->addProducts($product)
+            $customer->addProducts($allProducts[$randProduct])
                 ->setName('customer' . $i)
                 ->setEmail('email_' . $i . '@customer.fr')
                 ->setRole('ROLE_USER')
@@ -55,13 +62,18 @@ class ApiFixtures extends Fixture
             $manager->persist($customer);
         }
 
+        //dd(array_push($allCustomer[]);
+
         for ($i = 0; $i < 20; $i++) {
             $user = new User();
+
+            $randCustomer = shuffle($allCustomer); //define a randomly customer to add to an user
+
             //add Customer to User
             $user->setFirstName('bill_' . $i)
                 ->setLastName('hobbes_' . $i)
                 ->setEmail('email_' . $i . '@gemel.com')
-                ->setCustomer($customer);
+                ->setCustomer($allCustomer[$randCustomer]);
             $manager->persist($user);
         }
         $manager->flush();

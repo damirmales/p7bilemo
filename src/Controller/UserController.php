@@ -63,7 +63,7 @@ class UserController extends AbstractController
      */
     public function users(Request $request, TagAwareCacheInterface $cache)
     {
-        $limitPerPage = 6; //number of product per page paginate
+        $limitPerPage = 6; //number of user per page paginate
 
         $data = $cache->get('users', function (ItemInterface $item) {
             $item->expiresAfter(1800);
