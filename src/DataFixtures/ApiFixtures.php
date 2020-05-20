@@ -48,14 +48,16 @@ class ApiFixtures extends Fixture
         for ($i = 0; $i < 2; $i++) {
             $customer = new Customer();
             array_push($allCustomer, $customer);
-            $randProduct = shuffle($allProducts); //define a randomly product to add to a customer
             $encoded = $this->encoder->encodePassword($customer, $password);
             //add product to Customer
-            $customer->addProducts($allProducts[$randProduct])
-                ->setName('customer' . $i)
+            $customer->setName('customer' . $i)
                 ->setEmail('email_' . $i . '@customer.fr')
                 ->setRole('ROLE_USER')
                 ->setPassword($encoded);
+            for ($j = 0; $j < 20; $j++) {
+                $randProduct = shuffle($allProducts); //define a randomly product to add to a customer
+                $customer->addProducts($allProducts[$randProduct]);
+            }
             $manager->persist($customer);
         }
 
