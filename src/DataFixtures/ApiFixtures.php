@@ -39,7 +39,6 @@ class ApiFixtures extends Fixture
                 ->setPrice(mt_rand(100, 300))
                 ->setDescription("Ce smartphone est équipé d'un écran 5,1 pouces Full HD,
                  du processeur quatre coeurs Snapdragon 801 à 2,5 Ghz de Qualcomm et d'un capteur photo 16 mégapixels")
-
                 ->setCreatedAt(new \DateTime());
             $manager->persist($product);
         }
@@ -48,10 +47,8 @@ class ApiFixtures extends Fixture
         $password = 'motdepasse';
         for ($i = 0; $i < 2; $i++) {
             $customer = new Customer();
-
             array_push($allCustomer, $customer);
             $randProduct = shuffle($allProducts); //define a randomly product to add to a customer
-
             $encoded = $this->encoder->encodePassword($customer, $password);
             //add product to Customer
             $customer->addProducts($allProducts[$randProduct])
@@ -62,13 +59,9 @@ class ApiFixtures extends Fixture
             $manager->persist($customer);
         }
 
-        //dd(array_push($allCustomer[]);
-
         for ($i = 0; $i < 20; $i++) {
             $user = new User();
-
             $randCustomer = shuffle($allCustomer); //define a randomly customer to add to an user
-
             //add Customer to User
             $user->setFirstName('bill_' . $i)
                 ->setLastName('hobbes_' . $i)
