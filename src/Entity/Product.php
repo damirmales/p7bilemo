@@ -10,8 +10,11 @@ use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
- * @Hateoas\Relation("self", href = @Hateoas\Route("one_product", parameters = {"id" = "expr(object.getId())"}, absolute = true))
+ * @Hateoas\Relation("self", href = @Hateoas\Route("one_product",
+ *     parameters = {"id" = "expr(object.getId())"}, absolute = true))
  *
+ * @Hateoas\Relation("List", href = @Hateoas\Route("list_products",
+ *      absolute = true))
  */
 class Product
 {
