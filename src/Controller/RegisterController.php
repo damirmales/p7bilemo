@@ -9,6 +9,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Permet de gérer l'enregistrement des clients
@@ -28,10 +29,11 @@ class RegisterController extends AbstractController
      */
     public function register(Customer $customer,
                              EntityManagerInterface $entityManager,
-                             UserPasswordEncoderInterface $encoder)
+                             UserPasswordEncoderInterface $encoder,
+                             ValidatorInterface $validator)
     {
         $registerManager = new RegisterManager();
 
-        return $registerManager->register($customer,$entityManager, $encoder);
+        return $registerManager->register($customer,$entityManager, $encoder, $validator);
     }
 }

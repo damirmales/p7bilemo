@@ -27,6 +27,8 @@ class Customer implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="Ce champ doit être renseigné")
+     * @Assert\Regex(pattern="/^[^0-9][a-zA-Zàáâãäåçèéêëìíîïðòóôõöùúûüýÿ^'\x22][^'\x22&)(]+$/",
+     *      message="Ce champ doit uniquement contenir des lettres de l'alphabet")
      */
     private $name;
 
