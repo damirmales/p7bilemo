@@ -14,6 +14,12 @@ use Hateoas\Configuration\Annotation as Hateoas;
  * @Hateoas\Relation("self", href = @Hateoas\Route("one_user",
  *      parameters = {"id" = "expr(object.getId())"}, absolute = true))
  *
+ *  @Hateoas\Relation("list", href = @Hateoas\Route("list_users",
+ *       absolute = true))
+ *
+ *  @Hateoas\Relation("update", href = @Hateoas\Route("update_user",
+ *      parameters = {"id" = "expr(object.getId())"}, absolute = true))
+ *
  * @Hateoas\Relation("create", href = @Hateoas\Route("create_user",
  *       absolute = true))
  *
