@@ -27,7 +27,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank(message="Ce champ doit être renseigné")
+     * @Assert\NotBlank(message="Must not be empty")
      */
     private $name;
 
