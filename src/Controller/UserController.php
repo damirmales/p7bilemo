@@ -14,6 +14,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -80,15 +81,17 @@ class UserController extends AbstractController
     /**
      * @Get("/users/{id}", name="one_user")
      * @View(StatusCode = 200)
-     * @param User $user
-     * @return User
      * @Security("is_granted('ROLE_USER') ")
      */
-    public function getOneUser(User $user, TagAwareCacheInterface $cache)
+    public function getOneUser($id, TagAwareCacheInterface $cache)
     {
-        $this->requestedUser = $user;
+        $this->requestedUser = $this->userRepo->findById($id);
 
-        return $cache->get('users' . $user->getId(), function (ItemInterface $item) {
+        if (!$this->requestedUser) {
+            return new JsonResponse(['message' => "Not registered user"], 404);
+        }
+
+        return $cache->get('users' . $this->requestedUser[0]->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
             $userManager = new UserManager();
 
@@ -127,14 +130,19 @@ class UserController extends AbstractController
      * @return User|Response
      * @Security("is_granted('ROLE_USER') ")
      */
-    public function updateUser(User $user, User $updatedUser,
+    public function updateUser($id, User $updatedUser,
                                EntityManagerInterface $entityManager,
                                TagAwareCacheInterface $cache)
     {
-        $cache->delete('users' . $user->getId());
+        $this->requestedUser = $this->userRepo->findById($id);
+
+        if (!$this->requestedUser) {
+            return new JsonResponse(['message' => "Not registered user"], 404);
+        }
+        $cache->delete('users' . $this->requestedUser[0]->getId());
         $updateUser = new UserManager();
 
-        return $updateUser->updateUser($this->getUser(), $user, $updatedUser, $this->validator, $entityManager);
+        return $updateUser->updateUser($this->getUser(), $this->requestedUser, $updatedUser, $this->validator, $entityManager);
     }
 
     /**
@@ -144,12 +152,15 @@ class UserController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @Security("is_granted('ROLE_USER') ")
      */
-    public function deleteUser(User $user, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
+    public function deleteUser($id, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache)
     {
-        $cache->delete('users' . $user->getId());
-
+        $this->requestedUser = $this->userRepo->findById($id);
+        if (!$this->requestedUser) {
+            return new JsonResponse(['message' => "Not registered user"], 404);
+        }
+        $cache->delete('users' . $this->requestedUser[0]->getId());
         $updateUser = new UserManager();
 
-        return $updateUser->deleteUser($this->getUser(), $user, $entityManager);
+        return $updateUser->deleteUser($this->getUser(), $this->requestedUser, $entityManager);
     }
 }

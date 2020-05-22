@@ -15,9 +15,9 @@ class ProductManager
     public function showProduct($product, $customer)
     {
         $this->product = $product;
-        if ($this->product->getCustomers()->contains($customer)) {
+        if ($this->product[0]->getCustomers()->contains($customer)) {
             return $this->product;
         }
-        return new JsonResponse(['message' => 'L\'article ne vous appartient pas'], 401);
+        return new JsonResponse(['message' => 'this is not your Product'], 401);
     }
 }

@@ -26,16 +26,16 @@ class Customer implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank(message="Ce champ doit être renseigné")
+     * @Assert\NotBlank(message="Must not be empty")
      * @Assert\Regex(pattern="/^[^0-9][a-zA-Zàáâãäåçèéêëìíîïðòóôõöùúûüýÿ^'\x22][^'\x22&)(]+$/",
-     *      message="Ce champ doit uniquement contenir des lettres de l'alphabet")
+     *      message="Must contains letters only")
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank(message="Ce champ doit être renseigné")
-     * @Assert\Email( message = "Cet email '{{ value }}' n'est pas au format valide.")
+     * @Assert\NotBlank(message="Must not be empty")
+     * @Assert\Email( message = "This email '{{ value }}' is not valid.")
      */
     private $email;
 

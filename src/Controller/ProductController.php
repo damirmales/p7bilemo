@@ -12,6 +12,7 @@ use FOS\RestBundle\Controller\Annotations\View;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -72,14 +73,16 @@ class ProductController extends AbstractController
      * @Get("/products/{id}", name="one_product")
      * @View
      * @Security("is_granted('ROLE_USER') ")
-     * @param Product $product
-     * @return Product
      */
-    public function getOneProduct(Product $product, TagAwareCacheInterface $cache)
+    public function getOneProduct($id, TagAwareCacheInterface $cache)
     {
-        $this->product = $product;
+        $this->product = $this->productRepo->findById($id);
 
-        return $cache->get('products' . $product->getId(), function (ItemInterface $item) {
+        if (!$this->product) {
+            return new JsonResponse(['message' => "Not registered product"], 404);
+        }
+
+        return $cache->get('products' . $this->product[0]->getId(), function (ItemInterface $item) {
             $item->expiresAfter(1800);
             $productManager = new ProductManager();
 
