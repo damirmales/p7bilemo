@@ -4,7 +4,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/96e99bc8b0484136860644b310977ba0)](https://app.codacy.com/manual/d.males/p7bilemo?utm_source=github.com&utm_medium=referral&utm_content=damirmales/p7bilemo&utm_campaign=Badge_Grade_Dashboard)
 
 On github https://github.com/damirmales/p7bilemo Download the zip file of the project p7bilemo-master.zip 
-install it then go the root of the project
+install it then go to the root of the project
 
 Install composer as it’s needed to take care about depencies.
 With your command line launch a composer update 
