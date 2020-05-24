@@ -3,14 +3,17 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/96e99bc8b0484136860644b310977ba0)](https://app.codacy.com/manual/d.males/p7bilemo?utm_source=github.com&utm_medium=referral&utm_content=damirmales/p7bilemo&utm_campaign=Badge_Grade_Dashboard)
 
-Install composer as it’s needed to take care about depencies
+On github https://github.com/damirmales/p7bilemo Download the zip file of the project p7bilemo-master.zip 
+install it then go to the root of the project
+
+Install composer as it’s needed to take care about depencies.
 With your command line launch a composer update 
 
-Configure the the .env File to access your database
+Configure the the .env File to access your database, add a name of your futur database
 see section doctrine/doctrine-bundle 
 
 ##Setup the Database
-Start your local server, then in the project folder do in command line
+Start your local server, then go in the project folder do in command line
 ```
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
