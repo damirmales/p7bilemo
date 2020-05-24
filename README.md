@@ -16,6 +16,7 @@ see section doctrine/doctrine-bundle
 Start your local server, then go in the project folder do in command line
 ```
 php bin/console doctrine:database:create
+php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 php bin/console doctrine:fixtures:load
 ```
